@@ -59,6 +59,9 @@ public:
     static const char * const keyADSPStatus;
     static const char * const keyCanOpenProxy;
     static const char * const keyFmVolume;
+#ifdef STE_AUDIO
+    static const char *keySinkLatency;
+#endif
 
     String8 toString();
 

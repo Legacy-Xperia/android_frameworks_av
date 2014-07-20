@@ -71,6 +71,11 @@ struct audio_track_cblk_t
                 uint32_t    userBase;
                 uint32_t    serverBase;
 
+                // if there is a shared buffer, "buffers" is the value of pointer() for the shared
+                // buffer, otherwise "buffers" points immediately after the control block
+                void*       buffers;
+                uint32_t    frameCount;
+
                 int         mPad1;          // unused, but preserves cache line alignment
 
                 size_t      frameCount_;    // used during creation to pass actual track buffer size
@@ -97,6 +102,8 @@ private:
                 uint8_t     mPad2;           // unused
 
 public:
+                uint32_t    sampleRate;
+
                 // read-only for client, server writes once at initialization and is then read-only
                 uint8_t     mName;           // normal tracks: track name, fast tracks: track index
 

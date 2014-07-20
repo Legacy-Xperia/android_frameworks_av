@@ -167,7 +167,6 @@ public:
                             bool threadCanCallJava = false,
                             int sessionId = 0);
 
-
     /* Result of constructing the AudioRecord. This must be checked
      * before using any AudioRecord API (except for set()), because using
      * an uninitialized AudioRecord produces undefined results.
@@ -400,6 +399,9 @@ private:
     int                     mPreviousPriority;          // before start()
     SchedPolicy             mPreviousSchedulingGroup;
     AudioRecordClientProxy* mProxy;
+#ifdef STE_AUDIO
+    audio_input_clients     *mpInputClientId;
+#endif
 };
 
 }; // namespace android

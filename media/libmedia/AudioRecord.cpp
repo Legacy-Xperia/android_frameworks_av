@@ -84,9 +84,19 @@ status_t AudioRecord::getMinFrameCount(
 
 AudioRecord::AudioRecord()
     : mStatus(NO_INIT), mSessionId(0),
+#ifdef STE_AUDIO
+      mpInputClientId(NULL),
+#endif
       mPreviousPriority(ANDROID_PRIORITY_NORMAL), mPreviousSchedulingGroup(SP_DEFAULT),
       mProxy(NULL)
 {
+#ifdef STE_AUDIO
+    const sp<IAudioFlinger>& audioFlinger = AudioSystem::get_audio_flinger();
+    if (audioFlinger != 0) {
+        mpInputClientId = (audio_input_clients*)audioFlinger->addInputClient(
+                                                 (uint32_t)AUDIO_INPUT_CLIENT_RECORD);
+    }
+#endif
 }
 
 AudioRecord::AudioRecord(
@@ -100,10 +110,21 @@ AudioRecord::AudioRecord(
         int notificationFrames,
         int sessionId)
     : mStatus(NO_INIT), mSessionId(0),
+#ifdef STE_AUDIO
+      mpInputClientId(NULL),
+#endif
       mPreviousPriority(ANDROID_PRIORITY_NORMAL),
       mPreviousSchedulingGroup(SP_DEFAULT),
       mProxy(NULL)
 {
+#ifdef STE_AUDIO
+    const sp<IAudioFlinger>& audioFlinger = AudioSystem::get_audio_flinger();
+    if (audioFlinger != 0) {
+        mpInputClientId = (audio_input_clients*)audioFlinger->addInputClient(
+                                                 (uint32_t)AUDIO_INPUT_CLIENT_RECORD);
+    }
+#endif
+
     mStatus = set(inputSource, sampleRate, format, channelMask,
             frameCount, cbf, user, notificationFrames, false /*threadCanCallJava*/, sessionId);
 }
@@ -129,6 +150,12 @@ AudioRecord::~AudioRecord()
         IPCThreadState::self()->flushCommands();
         AudioSystem::releaseAudioSessionId(mSessionId);
     }
+#ifdef STE_AUDIO
+    const sp<IAudioFlinger>& audioFlinger = AudioSystem::get_audio_flinger();
+    if (audioFlinger != 0) {
+        audioFlinger->removeInputClient((uint32_t*)mpInputClientId);
+    }
+#endif
     delete mProxy;
 }
 
@@ -220,7 +247,13 @@ status_t AudioRecord::set(
                                                     sampleRate,
                                                     format,
                                                     channelMask,
+#ifdef STE_AUDIO
+                                                    (audio_in_acoustics_t)0,
+                                                    mSessionId,
+                                                    mpInputClientId);
+#else
                                                     mSessionId);
+#endif
     if (input == 0) {
         ALOGE("Could not get audio input for record source %d", inputSource);
         return BAD_VALUE;
@@ -383,6 +416,12 @@ size_t AudioRecord::frameSize() const
             return sizeof(uint8_t);
         }
     }
+#ifdef STE_AUDIO
+    const sp<IAudioFlinger>& audioFlinger = AudioSystem::get_audio_flinger();
+    if (audioFlinger != 0) {
+        audioFlinger->removeInputClient((uint32_t*)mpInputClientId);
+    }
+#endif
 }
 #endif
 
@@ -733,6 +772,7 @@ audio_io_handle_t AudioRecord::getInput_l()
                                 mSampleRate,
                                 mFormat,
                                 mChannelMask,
+                                (audio_in_acoustics_t)0,
                                 mSessionId);
     return mInput;
 }

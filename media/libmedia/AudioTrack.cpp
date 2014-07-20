@@ -210,6 +210,9 @@ AudioTrack::~AudioTrack()
         AudioSystem::releaseAudioSessionId(mSessionId);
 #endif
     }
+#ifdef STE_AUDIO
+        AudioSystem::unregisterLatencyNotificationClient(mLatencyClientId);
+#endif
     delete mProxy;
 }
 
@@ -1140,6 +1143,11 @@ status_t AudioTrack::createTrack_l(
         // Force buffer full condition as data is already present in shared memory
         mProxy->stepUser(frameCount);
     }
+#ifdef STE_AUDIO
+    if (mLatencyClientId != -1) {
+        AudioSystem::unregisterLatencyNotificationClient(mLatencyClientId);
+    }
+#endif
 
     return NO_ERROR;
 }
@@ -1724,6 +1732,15 @@ status_t AudioTrack::getTimeStamp(uint64_t *tstamp) {
         ALOGV("Timestamp %lld ", *tstamp);
     }
     return NO_ERROR;
+}
+#endif
+
+#ifdef STE_AUDIO
+// static
+void AudioTrack::LatencyCallback(void *cookie, audio_io_handle_t output, uint32_t sinkLatency)
+{
+    AudioTrack *me = static_cast<AudioTrack *>(cookie);
+    me->mLatency = sinkLatency + (1000*me->mCblk->frameCount) / me->mCblk->sampleRate;
 }
 #endif
 // =========================================================================

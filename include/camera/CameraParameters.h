@@ -834,6 +834,12 @@ public:
     static const char SCENE_MODE_FLOWERS[];
     static const char SCENE_MODE_AR[];
 #endif
+#ifdef STE_HARDWARE
+    static const char SCENE_MODE_BACKLIGHT[];
+    static const char SCENE_MODE_DUSKDAWN[];
+    static const char SCENE_MODE_FALLCOLOR[];
+    static const char SCENE_MODE_TEXT[];
+#endif
     // Applications are looking for a barcode. Camera driver will be optimized
     // for barcode reading.
     static const char SCENE_MODE_BARCODE[];
@@ -853,8 +859,18 @@ public:
 #ifdef QCOM_HARDWARE
     static const char PIXEL_FORMAT_YUV420SP_ADRENO[]; // ADRENO
 #endif
+#ifdef STE_HARDWARE
+    static const char PIXEL_FORMAT_YUV420SPNV12[]; // NV12
+#endif
     static const char PIXEL_FORMAT_YUV422I[]; // YUY2
     static const char PIXEL_FORMAT_YUV420P[]; // YV12
+#ifdef STE_HARDWARE
+    static const char PIXEL_FORMAT_YVU422SP[];
+    static const char PIXEL_FORMAT_YVU422P[];
+    static const char PIXEL_FORMAT_YVU420SP[];
+    static const char PIXEL_FORMAT_YVU420P[];
+    static const char PIXEL_FORMAT_YUV420MB[];
+#endif
     static const char PIXEL_FORMAT_RGB565[];
     static const char PIXEL_FORMAT_RGBA8888[];
     static const char PIXEL_FORMAT_JPEG[];
@@ -1062,6 +1078,27 @@ public:
     static const char SCENE_MODE_TEXT[];
 #endif
 
+#ifdef STE_HARDWARE
+    static const char FOCUS_MODE_FACEDETECT[];
+    static const char FOCUS_MODE_TOUCHAF[];
+    static const char ISO_50[];
+    static const char KEY_ANTI_SHAKE_MODE[];
+    static const char KEY_AUTO_CONTRAST[];
+    static const char KEY_BEAUTY_MODE[];
+    static const char KEY_BLUR_MODE[];
+    static const char KEY_VINTAGE_MODE[];
+    static const char KEY_WDR_MODE[];
+    static const char VINTAGE_MODE_BNW[];
+    static const char VINTAGE_MODE_COOL[];
+    static const char VINTAGE_MODE_NORMAL[];
+    static const char VINTAGE_MODE_OFF[];
+    static const char VINTAGE_MODE_WARM[];
+    static const char SCENE_MODE_DUSKDAWN[];
+    static const char SCENE_MODE_FALL[];
+    static const char SCENE_MODE_FALL_COLOR[];
+    static const char SCENE_MODE_TEXT[];
+#endif
+
    // Values for Redeye Reduction settings.
    // static const char REDEYE_REDUCTION_ENABLE[];
    // static const char REDEYE_REDUCTION_DISABLE[];
@@ -1081,6 +1118,12 @@ public:
     void setPostviewSize(int x, int y);
 #endif
     void getSupportedHfrSizes(Vector<Size> &sizes) const;
+#endif
+
+#ifdef STE_HARDWARE
+    // keys for record stride and slice height
+    static const char KEY_RECORD_STRIDE[];
+    static const char KEY_RECORD_SLICE_HEIGHT[];
 #endif
 
 private:

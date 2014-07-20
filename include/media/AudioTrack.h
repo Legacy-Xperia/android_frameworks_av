@@ -75,7 +75,11 @@ public:
         EVENT_NEW_POS = 4,          // Playback head is at a new position
                                     // (See setPositionUpdatePeriod()).
         EVENT_BUFFER_END = 5,       // Playback head is at the end of the buffer.
+#ifdef STE_AUDIO
+        EVENT_LATENCY_CHANGED = 6   // Audio sink latency has changed.
+#else
         EVENT_HW_FAIL = 6,          // ADSP failure.
+#endif
     };
 
     /* Client should declare Buffer on the stack and pass address to obtainBuffer()
@@ -548,6 +552,10 @@ protected:
             audio_io_handle_t getOutput_l();
             status_t restoreTrack_l(audio_track_cblk_t*& cblk, bool fromStart);
             bool stopped_l() const { return !mActive; }
+#ifdef STE_AUDIO
+            static void LatencyCallback(void *cookie, audio_io_handle_t output,
+                                 uint32_t sinkLatency);
+#endif
 
 #ifdef QCOM_HARDWARE
     sp<IDirectTrack>        mDirectTrack;
@@ -626,6 +634,10 @@ protected:
     AudioTrackClientProxy*  mProxy;
     bool                    mAwaitBoost;    // thread should wait for priority boost before running
     audio_io_handle_t       mOutput;
+#ifdef STE_AUDIO
+    int                     mLatencyClientId;
+#endif
+
 };
 
 class TimedAudioTrack : public AudioTrack
